@@ -25,11 +25,11 @@ class naveEspacial(pygame.sprite.Sprite):
 
     def movimientoDerecha(self):
         self.rect.right += self.velocidad
-        self.movimiento
+        self.movimiento()
 
     def movimientoIzquierda(self):
         self.rect.right -= self.velocidad
-        self.movimiento
+        self.movimiento()
 
     def movimiento(self):
         if self.Vida == True:
@@ -83,12 +83,12 @@ class Invasor(pygame.sprite.Sprite):
         
         
         self.listaDisparo = []
-        self.velocidad = 3
+        self.velocidad = 5
         self.rect.top = posy
         self.rect.left = posx
 
         self.rangoDisparo = 5
-        self.tiempoCambio = 3
+        self.tiempoCambio = 1
 
         self.derecha = True
         self.contador = 0
@@ -198,21 +198,15 @@ def SpaceInvader():
 
                 if x.rect.top <- 10:
                     jugador.listaDisparo.remove(x)       
-#        if len(listaEnemigo)>0:
-#            for enemigo in listaEnemigo:
-#                enemigo.comportamiento(tiempo)
-#                enemigo.dibujar(ventana)
 
-            if len(enemigo.listaDisparo)>0:
-                for x in enemigo.listaDisparo:
-                    x.dibujar(ventana)
-                    x.trayectoria()
+        if len(enemigo.listaDisparo)>0:
+            for x in enemigo.listaDisparo:
+                x.dibujar(ventana)
+                x.trayectoria()
 
-                    if x.rect.top > 900:
-                        enemigo.listaDisparo.remove(x)
-     
-     
-      
+                if x.rect.top >900:
+                    enemigo.listaDisparo.remove(x)
+              
         pygame.display.update()
 
 SpaceInvader()
