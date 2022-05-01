@@ -198,7 +198,7 @@ def SpaceInvader():
 
                 if x.rect.top <- 10:
                     jugador.listaDisparo.remove(x)       
-
+# TODO Incluir varios enemigos
         if len(enemigo.listaDisparo)>0:
             for x in enemigo.listaDisparo:
                 x.dibujar(ventana)
