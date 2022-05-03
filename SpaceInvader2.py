@@ -1,3 +1,4 @@
+from asyncio.constants import LOG_THRESHOLD_FOR_CONNLOST_WRITES
 import pygame,sys
 from pygame.locals import *
 from random import randint
@@ -70,10 +71,10 @@ class Proyectil(pygame.sprite.Sprite):
         superficie.blit(self.imageProyectil, self.rect)
 
 class Invasor(pygame.sprite.Sprite):
-    def __init__(self,posx,posy) -> None:
+    def __init__(self,posx,posy, distancia,imagenUno,imagenDos) -> None:
         pygame.sprite.Sprite.__init__(self)
-        self.imagenA = pygame.image.load('recursos/MarcianoA.jpg')
-        self.imagenB = pygame.image.load('recursos/MarcianoB.jpg')
+        self.imagenA = pygame.image.load(imagenUno)
+        self.imagenB = pygame.image.load(imagenDos)
         
         self.listaImagenes = [self.imagenA,self.imagenB]
         self.posImagen = 0
@@ -83,19 +84,19 @@ class Invasor(pygame.sprite.Sprite):
         
         
         self.listaDisparo = []
-        self.velocidad = 5
+        self.velocidad = 2
         self.rect.top = posy
         self.rect.left = posx
 
         self.rangoDisparo = 5
-        self.tiempoCambio = 1
+        self.tiempoCambio = 5
 
         self.derecha = True
         self.contador = 0
         self.Maxdescenso = self.rect.top +40
 
-#        self.limiteDerecha = posx+ distancia
-#        self.limiteIzquierda = posx- distancia        
+        self.limiteDerecha = posx+ distancia
+        self.limiteIzquierda = posx- distancia        
 
 
     def dibujar(self,superficie):
@@ -133,12 +134,12 @@ class Invasor(pygame.sprite.Sprite):
     def __movimientoLateral(self):
         if self.derecha == True:
             self.rect.left = self.rect.left + self.velocidad
-            if self.rect.left > 500: #self.limiteDerecha:
+            if self.rect.left > self.limiteDerecha:
                 self.derecha = False
                 self.contador +=1
         else:
             self.rect.left = self.rect.left - self.velocidad
-            if self.rect.left < 0: #self.limiteIzquierda:
+            if self.rect.left < self.limiteIzquierda:
                 self.derecha = True 
 
 
@@ -147,9 +148,24 @@ class Invasor(pygame.sprite.Sprite):
         miProyectil = Proyectil(x,y,'recursos/disparob.jpg',False)
         self.listaDisparo.append(miProyectil)
 
-#def cargarEnemigos():
-#    enemigo = Invasor(100,100,400,'recursos/MarcianoA.jpg','recursos/MarcianoB.jpg')
-#    listaEnemigo.append(enemigo)
+def cargarEnemigos():
+    posx = 100
+    for x in range(1,5): 
+        enemigo = Invasor(posx,100,40,'recursos/MarcianoA.jpg','recursos/MarcianoB.jpg',)
+        listaEnemigo.append(enemigo)
+        posx = posx +200
+    
+    posx = 100
+    for x in range(1,5): 
+        enemigo = Invasor(posx,0,40,'recursos/Marciano2A.jpg','recursos/Marciano2B.jpg',)
+        listaEnemigo.append(enemigo)
+        posx = posx +200
+
+    posx = 100
+    for x in range(1,5): 
+        enemigo = Invasor(posx,-100,40,'recursos/Marciano3A.jpg','recursos/Marciano3B.jpg',)
+        listaEnemigo.append(enemigo)
+        posx = posx +200
 
 def SpaceInvader():
     pygame.init()
@@ -159,8 +175,8 @@ def SpaceInvader():
     ImagenFondo = pygame.image.load('recursos/Fondo.jpg')
 
     jugador = naveEspacial()
-#    cargarEnemigos()
-    enemigo = Invasor(100,100)
+    cargarEnemigos()
+#    enemigo = Invasor(100,100)
     enJuego = True
     reloj = pygame.time.Clock()
     while True:
@@ -186,9 +202,9 @@ def SpaceInvader():
 
         ventana.blit(ImagenFondo,(0,0))
  
-        enemigo.comportamiento(tiempo)
+#        enemigo.comportamiento(tiempo)
         jugador.dibujar(ventana)
-        enemigo.dibujar(ventana)
+#        enemigo.dibujar(ventana)
 #        cargarEnemigos()
 
         if len(jugador.listaDisparo)>0:
@@ -197,16 +213,35 @@ def SpaceInvader():
                 x.trayectoria()
 
                 if x.rect.top <- 10:
-                    jugador.listaDisparo.remove(x)       
+                    jugador.listaDisparo.remove(x) 
+                else:
+                    for enemigo in listaEnemigo:
+                        if x.rect.colliderect(enemigo.rect):
+                            listaEnemigo.remove(enemigo)
+                            jugador.listaDisparo.remove(x)      
 # TODO Incluir varios enemigos
-        if len(enemigo.listaDisparo)>0:
-            for x in enemigo.listaDisparo:
-                x.dibujar(ventana)
-                x.trayectoria()
+        if len(listaEnemigo)>0:
+            for enemigo in listaEnemigo:
+                enemigo.comportamiento(tiempo)
+                enemigo.dibujar(ventana)
 
-                if x.rect.top >900:
-                    enemigo.listaDisparo.remove(x)
-              
+                if enemigo.rect.colliderect(jugador.rect):
+                    pass
+
+
+                if len(enemigo.listaDisparo)>0:
+                    for x in enemigo.listaDisparo:
+                        x.dibujar(ventana)
+                        x.trayectoria()
+                        if x.rect.colliderect(jugador.rect):
+                            pass
+                        if x.rect.top >900:
+                            enemigo.listaDisparo.remove(x)
+                        else:
+                            for disparo in jugador.listaDisparo:
+                                if x.rect.colliderect(disparo.rect):
+                                    jugador.listaDisparo.remove(disparo)
+                                    enemigo.listaDisparo.remove(x)
         pygame.display.update()
 
 SpaceInvader()
